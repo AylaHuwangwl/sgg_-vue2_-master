@@ -30,13 +30,11 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [
-  {
+export const constantRoutes = [{
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
@@ -51,16 +49,61 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: {
+        title: '首页',
+        icon: 'dashboard'
+      }
     }]
   },
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  },
+  {
+    path: '/product',
+    component: Layout,
+    name: 'Product',
+    meta: {
+      title: '商品管理',
+      icon: 'el-icon-goods'
+    },
+    children: [{
+      path: 'trademark',
+      name: 'TradeMark',
+      component: () => import('@/views/product/tradeMark'),
+      meta: { title: '品牌管理' }
+    },{
+      path: 'attr',
+      name: 'Attr',
+      component: () => import('@/views/product/Attr/index'),
+      meta: {
+        title: '平台属性管理',
+      }
+    },{
+      path: 'spu',
+      name: 'Spu',
+      component: () => import('@/views/product/Spu/index'),
+      meta: {
+        title: 'Spu管理',
+      }
+    },{
+      path: 'sku',
+      name: 'Sku',
+      component: () => import('@/views/product/Sku/index'),
+      meta: {
+        title: 'Sku管理',
+      }
+    },]
+  },
 ]
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRoutes
 })
 

@@ -10,7 +10,11 @@
     </el-card>
     <el-card>
       <div v-show="showTable">
-        <el-button type="primary" icon="el-icon-plus" @click="addAttr" :disabled="!(category3Id)"
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="addAttr"
+          :disabled="!category3Id"
           >添加属性</el-button
         >
         <el-table :data="attrList" style="width: 100%" border>
@@ -80,11 +84,16 @@
           </el-table-column>
           <el-table-column prop="attrName" label="属性值名称">
             <template slot-scope="{ row, $index }">
-              <span v-if="row.flag">{{ row.valueName }}</span>
+              <span v-if="row.flag" @click="toEdit($index, row)">{{
+                row.valueName
+              }}</span>
               <el-input
                 v-model="row.valueName"
                 placeholder="请输入属性值名称"
                 v-else
+                @blur="isLook($index, row)"
+                @keyup.native.enter="toLook(row)"
+                :ref="$index"
               ></el-input>
             </template>
           </el-table-column>
@@ -98,8 +107,13 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-button type="primary" @click="saveAttrValue">保存</el-button>
-        <el-button>取消</el-button>
+        <el-button
+          type="primary"
+          @click="saveAttrValue"
+          :disabled="!attrValueList.length"
+          >保存</el-button
+        >
+        <el-button @click="cancel">取消</el-button>
       </div>
     </el-card>
   </div>
@@ -127,6 +141,25 @@ export default {
   },
   mounted() {},
   methods: {
+    // input框失去焦点时
+    isLook(index, row) {
+      if (row.valueName == "") {
+        this.$message("属性值不能为空！");
+        return;
+      }
+      if (this.attrValueList.length) {
+        let isRepeat = this.attrValueList.some((item) => {
+          if (item !== row) {
+            return row.valueName == item.valueName;
+          }
+        });
+        if (isRepeat) {
+          this.$message("不能与已有属性值重复！");
+          return;
+        }
+      }
+      row.flag = true;
+    },
     // 获取三级分类Id
     getCategory3Id(value) {
       this.category3Id = value;
@@ -142,14 +175,19 @@ export default {
     },
     // 添加属性值
     addAttrValue() {
-      this.attrValueList.push(this.valueList);
-      console.log(this.attrValueList);
+      // console.log(this.valueList);
+      // this.valueList.valueName = '';
+      this.attrValueList.push({
+        valueName: "",
+        attrId: this.valueList.arrId,
+        flag: false,
+      });
     },
-    cancel() {},
     updateAttr(row) {
       this.showTable = false;
       this.attrName = row.attrName;
       this.id = row.id;
+      this.attrValueList = [];
       // this.attrValueList = row.attrValueList;
       for (let item of row.attrValueList) {
         let { attrId, valueName } = item;
@@ -164,6 +202,12 @@ export default {
     },
     // 保存添加的属性值
     saveAttrValue() {
+      for (let item of this.attrValueList) {
+        if (item.valueName == "") {
+          this.$message("属性值不能为空");
+          return;
+        }
+      }
       let baseAttrInfo = {
         attrName: this.attrName,
         attrValueList: this.attrValueList,
@@ -173,12 +217,23 @@ export default {
       };
       reqAddOrUpdateAttr(baseAttrInfo).then((res) => {
         if (res.code === 200) {
-          for(let item of this.attrValueList){
-            item.flag = undefined;
+          for (let item of this.attrValueList) {
+            item.flag = true;
           }
           this.showTable = true;
           this.$refs.CategorySelect.getAttrList();
         }
+      });
+    },
+    cancel() {
+      // isClick
+      this.showTable = true;
+      this.isClick = true;
+    },
+    toEdit(index, row) {
+      row.flag = false;
+      this.$nextTick(() => {
+        this.$refs[index].focus();
       });
     },
   },

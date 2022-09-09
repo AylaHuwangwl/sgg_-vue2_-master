@@ -99,11 +99,14 @@
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="160px">
             <template slot-scope="{ row, $index }">
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-              ></el-button>
+              <el-popconfirm :title="`确定删除${row.valueName}?`" @onConfirm="deleteAttrValue($index)">
+                <el-button
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  slot="reference"
+                ></el-button>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -172,6 +175,7 @@ export default {
     addAttr() {
       this.showTable = false;
       this.isClick = false;
+      this.attrName = "";
     },
     // 添加属性值
     addAttrValue() {
@@ -220,6 +224,8 @@ export default {
           for (let item of this.attrValueList) {
             item.flag = true;
           }
+          // this.valueList.attrId = '';
+          this.attrValueList = [];
           this.showTable = true;
           this.$refs.CategorySelect.getAttrList();
         }
@@ -229,6 +235,7 @@ export default {
       // isClick
       this.showTable = true;
       this.isClick = true;
+      this.attrValueList = [];
     },
     toEdit(index, row) {
       row.flag = false;
@@ -236,6 +243,9 @@ export default {
         this.$refs[index].focus();
       });
     },
+    deleteAttrValue(index){
+      this.attrValueList.splice(index,1);
+    }
   },
 };
 </script>

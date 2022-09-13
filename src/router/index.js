@@ -97,6 +97,44 @@ export const constantRoutes = [{
       }
     },]
   },
+  {
+    path: '/acl',
+    component: Layout,
+    name: 'Acl',
+    meta: {
+      title: '权限管理',
+      icon: 'el-icon-goods'
+    },
+    children: [{
+      path: 'user/list',
+      name: 'User',
+      component: () => import('@/views/acl/user/list'),
+      meta: { title: '用户管理' }
+    },{
+      path: 'role',
+      name: 'Role',
+      component: () => import('@/views/acl/role/list'),
+      meta: {
+        title: '角色管理',
+      }
+    },
+    // {
+    //   path: 'role/auth/:id',
+    //   name: 'Role',
+    //   component: () => import('@/views/acl/role/roleAuth'),
+    //   meta: {
+    //     title: '角色授权',
+    //   }
+    // },
+    {
+      path: 'Permission',
+      name: 'permission/list',
+      component: () => import('@/views/acl/permission/list'),
+      meta: {
+        title: '菜单管理',
+      }
+    },]
+  },
 ]
 
 const createRouter = () => new Router({
